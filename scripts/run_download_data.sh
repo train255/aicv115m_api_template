@@ -1,6 +1,7 @@
 #!/bin/bash
 
 pip install gdown
+mkdir -p data
 cd data
 # Download train data
 gdown https://drive.google.com/uc?id=1Oq9UgA9cEGMNRGvF7oNKkFOg6udsDprl
