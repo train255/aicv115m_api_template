@@ -142,6 +142,7 @@ def get_train_data(train_meta_df, train_extra_df):
     train_covid_extra_df = train_extra_df[train_extra_df['assessment_result'] == "1"].reset_index(drop=True)
     # File not found
     train_covid_extra_df = train_covid_extra_df.drop([10]).reset_index(drop=True)
+    train_covid_extra_df["assessment_result"] = train_covid_extra_df["assessment_result"].apply(lambda x: int(x))
     # Train Dataset
     train_data = pd.concat([train_nonote_df, train_covid_extra_df]).reset_index(drop=True)
     # Train test split

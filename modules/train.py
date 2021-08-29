@@ -14,7 +14,6 @@ def prepare_training_data(Config):
 
     train_extra_df = pd.read_csv(str(Config.ROOT_EXTRA_TRAIN_DIR / "extra_public_train_1235samples.csv"))
     train_extra_df["audio_path"] = train_extra_df["uuid"].apply(lambda x: str(Config.ROOT_EXTRA_TRAIN_DIR / "new_1235_audio_files/") + x + ".wav")
-    train_extra_df["assessment_result"] = train_extra_df["assessment_result"].apply(lambda x: int(x))
     return get_train_data(train_meta_df, train_extra_df)
 
 
