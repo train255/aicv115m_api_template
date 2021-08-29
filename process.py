@@ -46,7 +46,7 @@ def predict(df):
     featuresdf, input_shape = features_dataset(df)
     data = featuresdf.merge(df, left_on='audio_path', right_on='audio_path')
     images = np.array(data.feature.tolist())
-    images = images.reshape(images.shape[0], **input_shape)
+    images = images.reshape(images.shape[0], input_shape[0], input_shape[1], input_shape[2])
 
     cnn = CNNModel(input_shape)
     model = cnn.define()
