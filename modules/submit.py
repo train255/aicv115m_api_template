@@ -18,7 +18,7 @@ def create_submission():
     test_featuresdf, input_shape = features_dataset(test_df)
     test_data = test_featuresdf.merge(test_df, left_on='audio_path', right_on='audio_path')
     test_images = np.array(test_data.feature.tolist())
-    test_images = test_images.reshape(test_images.shape[0], num_rows, num_columns, num_channels)
+    test_images = test_images.reshape(test_images.shape[0], **input_shape)
 
     cnn = CNNModel(input_shape)
     model = cnn.define()
