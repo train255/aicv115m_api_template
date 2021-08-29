@@ -3,7 +3,7 @@ import pandas as pd
 import librosa
 import aubio
 
-from scipy.io import wavfile
+# from scipy.io import wavfile
 
 from sklearn.model_selection import train_test_split
 
@@ -11,11 +11,11 @@ from modules.feature import Features
 from modules.data_generator import DataGenerator
 
 
-def read_wav_file(filepath):
-    sample_rate, waveform = wavfile.read(filepath)
-    if waveform.ndim > 1:
-        waveform = waveform[:, 0]
-    return sample_rate, waveform
+# def read_wav_file(filepath):
+#     sample_rate, waveform = wavfile.read(filepath)
+#     if waveform.ndim > 1:
+#         waveform = waveform[:, 0]
+#     return sample_rate, waveform
 
 
 def avg_fq(audio_path):
@@ -79,8 +79,8 @@ def splitAudio(y, audio_path):
 
 def extract_features(file_name, is_training_set, covid):
     try:
-        # audio, sample_rate = librosa.load(file_name)
-        sample_rate, audio = read_wav_file(file_name)
+        audio, sample_rate = librosa.load(file_name)
+        # sample_rate, audio = read_wav_file(file_name)
         waves = []
         audio_splits = splitAudio(audio, file_name)
         num_rows = 120
