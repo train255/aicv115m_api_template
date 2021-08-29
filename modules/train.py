@@ -10,10 +10,13 @@ from tensorflow.keras.optimizers import Adam
 
 def prepare_training_data(Config):
     train_meta_df = pd.read_csv(str(Config.ROOT_TRAIN_DIR / "public_train_metadata.csv"))
-    train_meta_df["audio_path"] = train_meta_df["uuid"].apply(lambda x: str(Config.ROOT_TRAIN_DIR / "public_train_audio_files/") + x + ".wav")
+    train_meta_df['audio_path'] = train_meta_df['uuid'].apply(lambda x: str(
+        Config.ROOT_TRAIN_DIR / f"public_train_audio_files/{x}.wav"))
 
     train_extra_df = pd.read_csv(str(Config.ROOT_EXTRA_TRAIN_DIR / "extra_public_train_1235samples.csv"))
-    train_extra_df["audio_path"] = train_extra_df["uuid"].apply(lambda x: str(Config.ROOT_EXTRA_TRAIN_DIR / "new_1235_audio_files/") + x + ".wav")
+    train_extra_df['audio_path'] = train_extra_df['uuid'].apply(lambda x: str(
+        Config.ROOT_EXTRA_TRAIN_DIR / f"new_1235_audio_files/{x}.wav"))
+
     return get_train_data(train_meta_df, train_extra_df)
 
 

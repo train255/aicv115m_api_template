@@ -9,8 +9,9 @@ from modules.model import CNNModel
 
 def create_submission():
     test_df = pd.read_csv(str(Config.ROOT_TEST_DIR / "private_test_sample_submission.csv"))
-    test_audio_dir = str(Config.ROOT_TEST_DIR / "private_test_audio_files/")
-    test_df["audio_path"] = test_df["uuid"].apply(lambda x: test_audio_dir + x + ".wav")
+    test_df['audio_path'] = test_df['uuid'].apply(lambda x: str(
+        Config.ROOT_TEST_DIR / f"private_test_audio_files/{x}.wav"))
+
     test_df["is_training_set"] = [0] * len(test_df)
     test_df["assessment_result"] = [0] * len(test_df)
 
