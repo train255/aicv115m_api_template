@@ -115,8 +115,7 @@ def features_dataset(df):
         file_name = row["audio_path"]
         is_training_set = row["is_training_set"]
         covid = row["assessment_result"]
-        is_remove_noise = row["is_remove_noise"]
-        features_lst = extract_features(file_name, is_training_set, covid, is_remove_noise)
+        features_lst = extract_features(file_name, is_training_set, covid)
         if len(features_lst) > 0:
             for data in features_lst:
                 features.append([data, file_name])
