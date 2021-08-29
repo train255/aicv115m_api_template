@@ -5,3 +5,4 @@ __MACOSX/
 .idea
 .env
 assets/
+data/
