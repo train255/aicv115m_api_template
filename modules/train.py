@@ -21,9 +21,9 @@ def prepare_training_data(Config):
 
 
 def train():
-    best_model_path = str(Config.WEIGHT_PATH / "weights.best.basic_cnn_mfcc.hdf5")
-    train_generator, valid_generator, input_shape = prepare_training_data(Config)
-
+    best_model_path = str(Config.WEIGHT_PATH / "weights.best.hdf5")
+    train_generator, valid_generator = prepare_training_data(Config)
+    input_shape = (Config.NUM_ROWS, Config.NUM_COLUMNS, Config.NUM_CHANNELS)
     cnn = CNNModel(input_shape)
     model = cnn.define()
     

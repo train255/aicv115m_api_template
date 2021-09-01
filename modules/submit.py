@@ -1,11 +1,11 @@
 import os
 import zipfile
 import pandas as pd
-import numpy as np
 
 from configs.config import Config
 from modules.dataset import features_dataset
 from modules.model import CNNModel
+from modules.data_generator import DataGenerator
 
 def create_submission():
     test_df = pd.read_csv(str(Config.ROOT_TEST_DIR / "private_test_sample_submission.csv"))
@@ -15,14 +15,25 @@ def create_submission():
     test_df["is_training_set"] = [0] * len(test_df)
     test_df["assessment_result"] = [0] * len(test_df)
 
-    test_featuresdf, input_shape = features_dataset(test_df)
+    test_featuresdf = features_dataset(test_df)
     test_data = test_featuresdf.merge(test_df, left_on='audio_path', right_on='audio_path')
-    test_images = np.array(test_data.feature.tolist())
-    test_images = test_images.reshape(test_images.shape[0], input_shape[0], input_shape[1], input_shape[2])
+    params = dict(
+        batch_size=1,
+        n_rows=Config.NUM_ROWS,
+        n_columns=Config.NUM_COLUMNS,
+        n_channels=Config.NUM_CHANNELS,
+    )
+    params_test = dict(
+        shuffle=False,
+        **params
+    )
+    test_images = DataGenerator(test_data, **params_test)
+
+    input_shape = (Config.NUM_ROWS, Config.NUM_COLUMNS, Config.NUM_CHANNELS)
 
     cnn = CNNModel(input_shape)
     model = cnn.define()
-    best_model_path = str(Config.WEIGHT_PATH / "weights.best.basic_cnn_mfcc.hdf5")
+    best_model_path = str(Config.WEIGHT_PATH / "weights.best.hdf5")
     model.load_weights(best_model_path)
     y_pred = model.predict(test_images)
 

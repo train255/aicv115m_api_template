@@ -4,7 +4,7 @@ import librosa
 import aubio
 
 # from scipy.io import wavfile
-
+from configs.config import Config
 from sklearn.model_selection import train_test_split
 
 from modules.feature import Features
@@ -63,7 +63,7 @@ def audio_augmentation(samples):
 
 
 def splitAudio(y, audio_path):
-    nonMuteSections = librosa.effects.split(y, 21)
+    nonMuteSections = librosa.effects.split(y, 9, frame_length=8192)
     if (len(nonMuteSections) == 1) and (y.shape[0] == nonMuteSections[0][1]):
         frq_mean = avg_fq(audio_path)
         if frq_mean < 1:
@@ -83,11 +83,10 @@ def extract_features(file_name, is_training_set, covid):
         # sample_rate, audio = read_wav_file(file_name)
         waves = []
         audio_splits = splitAudio(audio, file_name)
-        num_rows = 120
-        num_columns = 430
+        num_rows = Config.NUM_ROWS
+        num_columns = Config.NUM_COLUMNS
         n_fft = 4096
-        hop_length = n_fft // 4
-        # hop_length = 512
+        hop_length = 512
         n_mels = 512
 
         extractor = Features(n_fft, hop_length, n_mels, num_rows, num_columns)
@@ -109,6 +108,13 @@ def extract_features(file_name, is_training_set, covid):
     return waves
 
 
+def add_pad_len(x):
+    if x.shape[1] <= Config.NUM_COLUMNS:
+        pad_width = Config.NUM_COLUMNS - x.shape[1]
+        x = np.pad(x, pad_width=((0,0),(0,pad_width)), mode='constant')
+    return x
+
+
 def features_dataset(df):
     features = []
     for index, row in df.iterrows():
@@ -118,46 +124,49 @@ def features_dataset(df):
         features_lst = extract_features(file_name, is_training_set, covid)
         if len(features_lst) > 0:
             for data in features_lst:
-                features.append([data, file_name])
+                features.append([data, file_name, data.shape[1]])
         else:
             print("Data is empty: ", file_name)
 
-    featuresdf = pd.DataFrame(features, columns=['feature', 'audio_path'])
+    featuresdf = pd.DataFrame(features, columns=['feature', 'audio_path', 'feature_shape1'])
+    featuresdf["feature"] = featuresdf["feature"].apply(add_pad_len)
+    # Get all features with shape[1] > 3
+    featuresdf = featuresdf[featuresdf["feature_shape1"] > 3].reset_index(drop=True)
     print('Finished feature extraction from ', len(featuresdf), ' files')
-    num_rows = featuresdf[featuresdf.index == 0].feature[0].shape[0]
-    num_columns = featuresdf[featuresdf.index == 0].feature[0].shape[1]
-    num_channels = 1
-    input_shape = (num_rows, num_columns, num_channels)
-
-    return featuresdf, input_shape
+    return featuresdf
 
 
 def get_train_data(train_meta_df, train_extra_df):
     # Not cough sound
     train_meta_df.drop(train_meta_df[train_meta_df['uuid'] == "23ccaa28-8cb8-43e4-9e59-112fa4dc6559"].index, inplace = True)
     train_nonote_df = train_meta_df[train_meta_df.audio_noise_note.isnull()].reset_index(drop=True)
-    train_nonote_df = train_nonote_df[["uuid","assessment_result", "audio_path", "cough_intervals"]]
+    train_nonote_df = train_nonote_df[["uuid","assessment_result", "audio_path"]]
 
     train_covid_extra_df = train_extra_df[train_extra_df['assessment_result'] == "1"].reset_index(drop=True)
     # File not found
     train_covid_extra_df = train_covid_extra_df.drop([10]).reset_index(drop=True)
     train_covid_extra_df["assessment_result"] = train_covid_extra_df["assessment_result"].apply(lambda x: int(x))
+
+    idx_lst = [169, 1063, 2064, 2297, 2512, 2723, 2832, 3143, 3600, 3774, 3820, 4191, 4378]
+    df_covid = train_meta_df.iloc[idx_lst][["uuid","assessment_result", "audio_path"]].reset_index(drop=True)
+
     # Train Dataset
-    train_data = pd.concat([train_nonote_df, train_covid_extra_df]).reset_index(drop=True)
+    train_data = pd.concat([train_nonote_df, df_covid, train_covid_extra_df]).reset_index(drop=True)
+
     # Train test split
     idx_train, _, _, _ = train_test_split(train_data[["audio_path"]], train_data[["assessment_result"]], test_size=0.1, random_state = 42)
     path_lst = idx_train["audio_path"].tolist()
     train_data["is_training_set"] = train_data["audio_path"].apply(lambda x: 1 if x in path_lst else 0)
     # Get features
-    train_featuresdf, input_shape = features_dataset(train_data)
+    train_featuresdf = features_dataset(train_data)
     train_data = train_data.merge(train_featuresdf, left_on='audio_path', right_on='audio_path')
 
     # Data generator
     params = dict(
         batch_size=16,
-        n_rows=input_shape[0],
-        n_columns=input_shape[1],
-        n_channels=input_shape[2],
+        n_rows=Config.NUM_ROWS,
+        n_columns=Config.NUM_COLUMNS,
+        n_channels=Config.NUM_CHANNELS,
     )
     params_train = dict(
         shuffle=True,
@@ -172,4 +181,4 @@ def get_train_data(train_meta_df, train_extra_df):
     train_generator = DataGenerator(X_train, **params_train)
     valid_generator = DataGenerator(X_valid, **params_valid)
 
-    return train_generator, valid_generator, input_shape
+    return train_generator, valid_generator

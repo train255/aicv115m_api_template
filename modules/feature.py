@@ -1,5 +1,6 @@
 import librosa
 import numpy as np
+import math
 
 # Class that contains the feature computation functions
 class Features:
@@ -21,9 +22,7 @@ class Features:
             n_mels=self.n_mels
         )
         if feat.shape[1] <= self.num_columns:
-            pad_width = self.num_columns - feat.shape[1]
-            feat = np.pad(feat, pad_width=((0,0),(0,pad_width)), mode='constant')
-            return feat
+            return [feat]
         else:
-            print("mfcc.shape[1]: ", feat.shape[1])
-            return None
+            num_sub = math.ceil(feat.shape[1] / self.num_columns)
+            return np.array_split(feat, num_sub, axis=1)

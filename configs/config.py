@@ -12,3 +12,7 @@ class Config:
     WEIGHT_PATH.mkdir(parents=True, exist_ok=True)
 
     SUBMISSION_PATH = Path("./submissions")
+    # INPUT_SHAPE
+    NUM_ROWS = 96
+    NUM_COLUMNS = 96
+    NUM_CHANNELS = 1
