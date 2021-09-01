@@ -124,11 +124,13 @@ def features_dataset(df):
         features_lst = extract_features(file_name, is_training_set, covid)
         if len(features_lst) > 0:
             for data in features_lst:
-                features.append([data, file_name, data.shape[1]])
+                features.append([data, file_name])
         else:
             print("Data is empty: ", file_name)
 
-    featuresdf = pd.DataFrame(features, columns=['feature', 'audio_path', 'feature_shape1'])
+    featuresdf = pd.DataFrame(features, columns=['feature', 'audio_path'])
+
+    featuresdf["feature_shape1"] = featuresdf["feature"].apply(lambda x: x.shape[1])
     featuresdf["feature"] = featuresdf["feature"].apply(add_pad_len)
     # Get all features with shape[1] > 3
     featuresdf = featuresdf[featuresdf["feature_shape1"] > 3].reset_index(drop=True)
