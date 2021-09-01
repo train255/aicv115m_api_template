@@ -5,7 +5,7 @@ from modules.dataset import get_train_data
 
 from modules.model import CNNModel
 
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.optimizers import Adam
 
 def prepare_training_data(Config):
@@ -27,19 +27,19 @@ def train():
     cnn = CNNModel(input_shape)
     model = cnn.define()
     
-    opt = Adam(learning_rate=0.00001)
-    model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"])
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='binary_crossentropy', metrics=["accuracy"])
 
     checkpointer = ModelCheckpoint(
         filepath=best_model_path,
         monitor="val_accuracy", verbose=1, save_best_only=True)
     es_callback = EarlyStopping(monitor="val_accuracy", patience=10, verbose=1)
+    reduce_lr = ReduceLROnPlateau(monitor="val_accuracy", factor=0.3, patience=1, verbose=1, min_delta=0.0001, cooldown=1, min_lr=0.00001)
 
     model.fit(
         train_generator,
-        epochs=100,
+        epochs=50,
         validation_data=valid_generator,
-        callbacks=[checkpointer,es_callback],
+        callbacks=[checkpointer,es_callback,reduce_lr],
         verbose=1
     )
 
