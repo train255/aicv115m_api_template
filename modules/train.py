@@ -21,9 +21,12 @@ def prepare_training_data(Config):
 
 
 def train():
+    print("====== PREPARE TRAINING DATA ======")
     best_model_path = str(Config.WEIGHT_PATH / "weights.best.hdf5")
     train_generator, valid_generator = prepare_training_data(Config)
     input_shape = (Config.NUM_ROWS, Config.NUM_COLUMNS, Config.NUM_CHANNELS)
+
+    print("====== TRAINING ======")
     cnn = CNNModel(input_shape)
     model = cnn.define()
     
@@ -32,7 +35,7 @@ def train():
     checkpointer = ModelCheckpoint(
         filepath=best_model_path,
         monitor="val_accuracy", verbose=1, save_best_only=True)
-    es_callback = EarlyStopping(monitor="val_accuracy", patience=10, verbose=1)
+    es_callback = EarlyStopping(monitor="val_accuracy", patience=5, verbose=1)
     reduce_lr = ReduceLROnPlateau(monitor="val_accuracy", factor=0.3, patience=1, verbose=1, min_delta=0.0001, cooldown=1, min_lr=0.00001)
 
     model.fit(
