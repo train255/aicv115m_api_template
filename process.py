@@ -68,7 +68,7 @@ def predict(df):
     y_pred = model.predict(images)
     
     predictions = [p[0] for p in y_pred]
-    print(predictions)
-    print(np.mean(predictions[0]))
+    # print(predictions)
+    # print(np.mean(predictions))
 
-    return np.mean(predictions[0])
+    return np.mean(predictions)
