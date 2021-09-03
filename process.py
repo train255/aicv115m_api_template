@@ -53,4 +53,6 @@ def predict(df):
     best_model_path = str(Config.WEIGHT_PATH / "weights.best.basic_cnn_mfcc.hdf5")
     model.load_weights(best_model_path)
     y_pred = model.predict(images)
-    return y_pred[0][0]
+    
+    predictions = [p[0] for p in y_pred]
+    return np.mean(predictions)
