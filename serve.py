@@ -11,10 +11,10 @@ from configs import AssetsConfig
 from process import predict, convert_to_wav
 
 
-from pyngrok import ngrok
-import nest_asyncio
-ngrok_tunnel = ngrok.connect(8000)
-print('Public URL:', ngrok_tunnel.public_url)
+# from pyngrok import ngrok
+# import nest_asyncio
+# ngrok_tunnel = ngrok.connect(8000)
+# print('Public URL:', ngrok_tunnel.public_url)
 
 
 class Metadata(BaseModel):
@@ -91,5 +91,5 @@ async def predict_assessment(meta: Metadata = Form(...), audio_file: UploadFile 
 
 
 if __name__ == "__main__":
-    nest_asyncio.apply()
+    # nest_asyncio.apply()
     uvicorn.run(app, host="0.0.0.0", port=8000)
