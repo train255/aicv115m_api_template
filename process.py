@@ -5,6 +5,7 @@ from configs.config import Config
 from modules.dataset import features_dataset
 from modules.model import CNNModel
 from modules.data_generator import DataGenerator
+import numpy as np
 
 
 def convert_to_wav(file_path):
@@ -65,5 +66,9 @@ def predict(df):
     best_model_path = str(Config.WEIGHT_PATH / "weights.best.hdf5")
     model.load_weights(best_model_path)
     y_pred = model.predict(images)
-    print("y_pred", y_pred)
-    return y_pred[0][0]
+    
+    predictions = [p[0] for p in y_pred]
+    print(predictions)
+    print(np.mean(predictions[0]))
+
+    return np.mean(predictions[0])
