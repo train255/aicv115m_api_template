@@ -8,3 +8,6 @@ aiofiles
 python-multipart
 aubio==0.4.9
 tensorflow
+uvicorn
+pydantic
+fastapi
