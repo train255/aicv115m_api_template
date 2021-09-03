@@ -87,7 +87,7 @@ async def predict_assessment(meta: Metadata = Form(...), audio_file: UploadFile 
     # with open(metadata_path, 'w') as f:
     #     json.dump(metadata_json, f)
 
-    return {"assessment": assessment}
+    return {"assessment": str(assessment)}
 
 
 if __name__ == "__main__":
