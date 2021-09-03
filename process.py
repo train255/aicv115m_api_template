@@ -65,4 +65,5 @@ def predict(df):
     best_model_path = str(Config.WEIGHT_PATH / "weights.best.hdf5")
     model.load_weights(best_model_path)
     y_pred = model.predict(images)
+    print("y_pred", y_pred)
     return y_pred[0][0]
