@@ -7,8 +7,14 @@ from typing import Optional
 from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 
-from configs import AssetsConfig
+from configs.config import Config
 from process import predict, convert_to_wav
+
+
+from pyngrok import ngrok
+import nest_asyncio
+ngrok_tunnel = ngrok.connect(8000)
+print('Public URL:', ngrok_tunnel.public_url)
 
 
 class Metadata(BaseModel):
@@ -48,7 +54,7 @@ async def predict_assessment(meta: Metadata = Form(...), audio_file: UploadFile 
     # save audio
     ext = audio_file.filename.split(".")[-1]
     audio_path = str(
-        AssetsConfig.AUDIO_PATH / "{}-{}.{}".format(meta.uuid, timestamp, ext))
+        Config.AUDIO_PATH / "{}-{}.{}".format(meta.uuid, timestamp, ext))
     async with aiofiles.open(audio_path, 'wb') as f:
         content = await audio_file.read()  # async read
         await f.write(content)  # async write
@@ -76,14 +82,15 @@ async def predict_assessment(meta: Metadata = Form(...), audio_file: UploadFile 
 
     metadata_json['assessment'] = assessment
 
-    # save metadata
-    metadata_path = str(
-        AssetsConfig.META_PATH / "{}-{}.json".format(meta.uuid, timestamp))
-    with open(metadata_path, 'w') as f:
-        json.dump(metadata_json, f)
+    # # save metadata
+    # metadata_path = str(
+    #     AssetsConfig.META_PATH / "{}-{}.json".format(meta.uuid, timestamp))
+    # with open(metadata_path, 'w') as f:
+    #     json.dump(metadata_json, f)
 
     return {"assessment": assessment}
 
 
 if __name__ == "__main__":
-    uvicorn.run("serve:app", host="0.0.0.0")
+    nest_asyncio.apply()
+    uvicorn.run("serve:app", host="0.0.0.0", port=8000)
