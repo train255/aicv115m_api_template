@@ -80,8 +80,7 @@ async def predict_assessment(meta: Metadata = Form(...), audio_file: UploadFile 
     df = pd.DataFrame([metadata_json])
     assessment = predict(df)
 
-    metadata_json['assessment'] = assessment
-
+    # metadata_json['assessment'] = assessment
     # # save metadata
     # metadata_path = str(
     #     AssetsConfig.META_PATH / "{}-{}.json".format(meta.uuid, timestamp))
