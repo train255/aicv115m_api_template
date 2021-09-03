@@ -1,10 +1,28 @@
-## Download data and train
+
+## Train data
+### 1 - Download train data
+```bash
+chmod +x scripts/download_trainset.sh
+./scripts/download_trainset.sh
+```
+
+### 2 - Training
 ```bash
 chmod +x scripts/run_train.sh
 ./scripts/run_train.sh
 ```
 
 ## Submission
+
+### 1 - Download test data
+```bash
+chmod +x scripts/download_testset.sh
+./scripts/download_testset.sh
+```
+
+### 2 - Create submission
+You can download [the pretrained-model](https://drive.google.com/file/d/1zkXetgBifefAfQgS3o2j8zYlCGZi3S7h/view?usp=sharing) to create submission without training phase
+
 ```bash
 chmod +x scripts/run_submission.sh
 ./scripts/run_submission.sh
